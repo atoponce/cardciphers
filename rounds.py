@@ -2,6 +2,7 @@ import talon
 
 t = talon.Cipher()
 d = [i for i in xrange(1,53)] # must fill with values 1-52
+t.shuffle_deck(d)
 faces = [None] * 52
 cards = (
     'AC','2C','3C','4C','5C','6C','7C','8C','9C','TC','JC','QC','KC',
@@ -11,7 +12,14 @@ cards = (
     )
 outs = []
 
-rounds = 50
+rounds = 10
+
+print "Starting deck:"
+for index, value in enumerate(d):
+    faces[index] = cards[value-1]
+for face in faces:
+    print face,
+print ""
 
 print "Deck rounds:"
 for i in xrange(rounds):

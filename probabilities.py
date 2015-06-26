@@ -2,7 +2,7 @@ import talon
 
 t = talon.Cipher()
 d = [i for i in xrange(1,53)]
-#t.shuffle_deck(d)
+t.shuffle_deck(d)
 
 counts = {}
 rounds = 1612000
