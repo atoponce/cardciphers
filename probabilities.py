@@ -5,7 +5,7 @@ d = [i for i in xrange(1,53)]
 t.shuffle_deck(d)
 
 counts = {}
-rounds = 1612000
+rounds = 52*100000
 
 for i in xrange(rounds):
     n = t.prng(d)

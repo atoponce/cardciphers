@@ -2,10 +2,12 @@ import math
 import random
 
 class Cipher:
-    talon_1 = []
-    talon_2 = []
-    talon_3 = []
-    talon_4 = []
+
+    def __init__(self):
+        self.talon_1 = []
+        self.talon_2 = []
+        self.talon_3 = []
+        self.talon_4 = []
 
     def shuffle_deck(self, deck):
         i = 52
@@ -86,8 +88,6 @@ class Cipher:
         deck = self.step_3(deck)
         numb = self.step_4(deck)
 
-        self.talon_1 = []
-        self.talon_2 = []
-        self.talon_3 = []
-        self.talon_4 = []
+        self.__init__()
+
         return numb
