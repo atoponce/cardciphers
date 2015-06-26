@@ -13,7 +13,7 @@ outs = []
 
 rounds = 50
 
-print "Deck rounds"
+print "Deck rounds:"
 for i in xrange(rounds):
     outs.append(t.prng(d))
 

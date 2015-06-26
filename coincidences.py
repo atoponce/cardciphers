@@ -5,7 +5,7 @@ t = talon.Cipher()
 last = -1
 count = 0
 rounds = 1612000
-d = [i for i in xrange(52)]
+d = [i for i in xrange(1,53)]
 t.shuffle_deck(d)
 
 for i in xrange(rounds):

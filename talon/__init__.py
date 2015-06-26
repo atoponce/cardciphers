@@ -76,7 +76,7 @@ class Cipher:
         '''' Determine the output card '''
         top_card = deck[0] # AC = 1, not 0
         bottom_card = deck[51] # KS = 52, not 51
-        card = deck[(top_card+bottom_card) % 52 - 1]
+        card = deck[(top_card+bottom_card) % 52]
         return card # Again, Ac = 1, not 0, etc.
 
     def prng(self, deck):
