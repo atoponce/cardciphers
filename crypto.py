@@ -1,41 +1,40 @@
 import talon
 import encoder
+import argparse
 
-def get_keystream(message):
-    t = talon.Cipher()
-    d = [i for i in xrange(1,53)]
-    outs = []
+parser = argparse.ArgumentParser(description='Python implementation of Talon')
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument('-d', '--decrypt', help='Decrypt a message')
+group.add_argument('-e', '--encrypt', help='Encrypt a message')
+parser.add_argument('-k', '--key', help='Private key')
+args = parser.parse_args()
 
-    for i in xrange(len(message)):
-        outs.append(t.prng(d))
-    
-    return outs
+alg = talon.Cipher()
+deck = [i for i in xrange(1,53)]
 
-plain = 'Apache/2.2.22 (Debian) Server at ae7.st Port 80'
-print(plain)
-plain = plain.upper()
-pad = 5 - len(plain) % 5
-plain = plain + 'X' * pad
+if args.key:
+    t = True
 
-outs = get_keystream(plain)
-ct = encoder.encrypt(plain, outs)
+if args.encrypt:
+    plaintext = args.encrypt.upper()
+    encrypted = encoder.encrypt(plaintext, alg, deck)
 
-cipher = ''
-for i, c in enumerate(ct):
-    if i % 5 < 4:
-        cipher += c
-    else:
-        cipher = cipher + c + ' '
+    ciphertext = ''
+    for index, char in enumerate(encrypted):
+        if index % 5 < 4:
+            ciphertext += char
+        else:
+            ciphertext += char + ' '
+    print(ciphertext)
 
-print('Encrypted: {0}'.format(cipher))
+elif args.decrypt:
+    ciphertext = args.decrypt.replace(' ','')
+    decrypted = encoder.decrypt(ciphertext, alg, deck)
 
-cipher = cipher.replace(' ','')
+    plaintext = ''
+    for char in decrypted:
+        plaintext += char
+    print(plaintext)
 
-outs = get_keystream(cipher)
-pt = encoder.decrypt(cipher, outs)
-
-plain = ''
-for c in pt:
-    plain += c
-    
-print('Decrypted: {0}'.format(plain))
+else:
+    print('-e|--encrypt or -d|--decrypt is required')
