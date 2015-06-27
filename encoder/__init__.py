@@ -1,30 +1,31 @@
-def encrypt(message, base, keystream):
-    if base == 26:
-        s = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-    if base == 52:
-        s = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&()-=+:,./?')
+def encrypt(message, keystream):
+    plist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&()-=+:,./? ')
+    clist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
+    
+    for char in message:
+        if not char in plist:
+            message = message.replace(char, '')
 
     ct = []
 
-    for n, c in zip(keystream, message):
-        ct.append((n + s.index(c)) % base)
+    for num, char in zip(keystream, message):
+        ct.append((num + plist.index(char)) % 52)
 
-    for i, v in enumerate(ct):
-        ct[i] = s[v]
+    for index, value in enumerate(ct):
+        ct[index] = clist[value]
 
     return ct
 
-def decrypt(message, base, keystream):
-    if base == 26:
-        s = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-    if base == 52:
-        s = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&()-=+:,./?')
+def decrypt(message, keystream):
+    clist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
+    plist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&()-=+:,./? ')
 
     pt = []
-    for n, c in zip(keystream, message):
-        pt.append((s.index(c) - n) % base)
 
-    for i, v in enumerate(pt):
-        pt[i] = s[v]
+    for num, char in zip(keystream, message):
+        pt.append((clist.index(char) - num) % 52)
+
+    for index, value in enumerate(pt):
+        pt[index] = plist[value]
 
     return pt
