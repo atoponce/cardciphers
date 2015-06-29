@@ -15,7 +15,7 @@ alg = talon.Cipher()
 deck = [i for i in xrange(1,53)]
 
 if args.passphrase:
-    passphrase = encoder.talon_kdf(args.passphrase)
+    passphrase = args.passphrase.upper()
     for char in passphrase:
         alg.mix_deck(deck)
         deck = alg.count_cut(deck, encoder.clist.index(char)+1)
