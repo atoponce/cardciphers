@@ -8,18 +8,17 @@ parser = argparse.ArgumentParser(description='Python implementation of Talon')
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('-d', '--decrypt', help='Decrypt a message')
 group.add_argument('-e', '--encrypt', help='Encrypt a message')
-parser.add_argument('-k', '--key', help='Private key')
+parser.add_argument('-p', '--passphrase', help='Private passphrase to key deck')
 args = parser.parse_args()
 
 alg = talon.Cipher()
 deck = [i for i in xrange(1,53)]
-plist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&()-=+:,./? ')
 
-if args.key:
-    key = args.key.upper()
-    for char in key:
+if args.passphrase:
+    passphrase = encoder.talon_kdf(args.passphrase)
+    for char in passphrase:
         alg.mix_deck(deck)
-        deck = alg.count_cut(deck, plist.index(char)+1)
+        deck = alg.count_cut(deck, encoder.clist.index(char)+1)
 
 if args.encrypt:
     plaintext = args.encrypt.upper()
