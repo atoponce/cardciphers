@@ -1,8 +1,14 @@
 import random
 import string
 
-plist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&()-=+:,./? ')
+plist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%&()-=+:,./? ')
 clist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
+
+def talon_kdf(passphrase):
+    new_pass = ""
+    for char in passphrase:
+        new_pass += clist[plist.index(char.upper())]
+    return new_pass
 
 def get_keystream(message, alg, deck):
     outs = []
