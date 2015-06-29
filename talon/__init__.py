@@ -25,7 +25,6 @@ class Cipher:
         self.talon_4.append(deck[3])
         for i in xrange(4):
             deck[0:1] = []
-        return deck
 
     def step_2(self, deck):
         ''' Populate the 4 "talons" '''
@@ -60,7 +59,6 @@ class Cipher:
         for i in xrange(top_card-1):
             self.talon_4.insert(0, deck[0])
             deck[0:1] = []
-        return deck
 
     def step_3(self, deck):
         ''' Collect the 4 "talons" into the main deck '''
@@ -72,22 +70,26 @@ class Cipher:
             self.talon_1.append(i)
         for i in self.talon_1:
             deck.append(i)
-        return deck
 
     def step_4(self, deck):
         '''' Determine the output card '''
         top_card = deck[0] # AC = 1, not 0
         bottom_card = deck[51] # KS = 52, not 51
-        card = deck[(top_card+bottom_card) % 52]
-        return card # Again, Ac = 1, not 0, etc.
+        return deck[(top_card+bottom_card) % 52]
+
+    def mix_deck(self, deck):
+        ''' Execute steps 1-3 without the PRNG '''
+        self.step_1(deck)
+        self.step_2(deck)
+        self.step_3(deck)
+        self.__init__()
+
+    def count_cut(self, deck, index):
+        ''' For keys and IVs only, do a count cut on the deck '''
+        cut = (deck[0] + index) % 52
+        return deck[cut:] + deck[:cut]
 
     def prng(self, deck):
         ''' One full round of the Talon algorithm. Outputs a single value. '''
-        deck = self.step_1(deck)
-        deck = self.step_2(deck)
-        deck = self.step_3(deck)
-        numb = self.step_4(deck)
-
-        self.__init__()
-
-        return numb
+        self.mix_deck(deck)
+        return self.step_4(deck)
