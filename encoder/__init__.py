@@ -1,3 +1,9 @@
+import random
+import string
+
+plist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&()-=+:,./? ')
+clist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
+
 def get_keystream(message, alg, deck):
     outs = []
     for i in xrange(len(message)):
@@ -16,7 +22,6 @@ def pad_message(message):
         message += '22'
     else:
         message += '1'
-
     return message
 
 def unpad_message(message):
@@ -31,21 +36,26 @@ def unpad_message(message):
         message = message[:-4]
     else:
         message = message[:-5]
-
     return message
 
+def create_iv():
+    r = random.SystemRandom()
+    return "".join(r.choice(string.ascii_letters) for i in xrange(5))
+
 def encrypt(message, alg, deck):
-    plist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&()-=+:,./? ')
-    clist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
+    ct = []
+    iv = create_iv()
     
     for char in message:
         if not char in plist:
             message = message.replace(char, '')
+    
+    for char in iv:
+        alg.mix_deck(deck)
+        deck = alg.count_cut(deck, clist.index(char) + 1)
 
     message = pad_message(message)
     keystream = get_keystream(message, alg, deck)
-
-    ct = []
 
     for num, char in zip(keystream, message):
         ct.append((num + plist.index(char)) % 52)
@@ -53,21 +63,23 @@ def encrypt(message, alg, deck):
     for index, value in enumerate(ct):
         ct[index] = clist[value]
 
-    return ct
+    return list(iv) + ct
 
 def decrypt(message, alg, deck):
-    clist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
-    plist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&()-=+:,./? ')
+    pt = []
+    iv = message[:5]
+    message = message[5:]
+
+    for char in iv:
+        alg.mix_deck(deck)
+        deck = alg.count_cut(deck, clist.index(char) + 1)
 
     keystream = get_keystream(message, alg, deck)
-    pt = []
 
     for num, char in zip(keystream, message):
-        pt.append((clist.index(char) - num) % 52)
+        pt.append(((clist.index(char)) - num) % 52)
 
     for index, value in enumerate(pt):
         pt[index] = plist[value]
 
-    pt = unpad_message(pt)
-    
-    return pt
+    return unpad_message(pt)
