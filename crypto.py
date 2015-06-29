@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import talon
 import encoder
 import argparse
@@ -11,9 +13,13 @@ args = parser.parse_args()
 
 alg = talon.Cipher()
 deck = [i for i in xrange(1,53)]
+plist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&()-=+:,./? ')
 
 if args.key:
-    t = True
+    key = args.key.upper()
+    for char in key:
+        alg.mix_deck(deck)
+        deck = alg.count_cut(deck, plist.index(char)+1)
 
 if args.encrypt:
     plaintext = args.encrypt.upper()
