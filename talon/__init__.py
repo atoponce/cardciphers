@@ -2,6 +2,8 @@ import math
 import random
 
 class Cipher:
+    index_set = False
+    secret_index = -1
 
     def __init__(self):
         self.talon_1 = []
@@ -28,32 +30,28 @@ class Cipher:
 
     def step_2(self, deck):
         ''' Populate the 4 "talons" '''
-        # talon 1
-        top_card = (self.talon_1[0]%13)
+        top_card = self.talon_1[0]%13
         if top_card == 0:
             top_card = 13
         for i in xrange(top_card-1):
             self.talon_1.insert(0, deck[0])
             deck[0:1] = []
 
-        # talon 2
-        top_card = (self.talon_2[0]%13)
+        top_card = self.talon_2[0]%13
         if top_card == 0:
             top_card = 13
         for i in xrange(top_card-1):
             self.talon_2.insert(0, deck[0])
             deck[0:1] = []
 
-        # talon 3
-        top_card = (self.talon_3[0]%13)
+        top_card = self.talon_3[0]%13
         if top_card == 0:
             top_card = 13
         for i in xrange(top_card-1):
             self.talon_3.insert(0, deck[0])
             deck[0:1] = []
 
-        # talon 4
-        top_card = (self.talon_4[0]%13)
+        top_card = self.talon_4[0]%13
         if top_card == 0:
             top_card = 13
         for i in xrange(top_card-1):
@@ -73,9 +71,10 @@ class Cipher:
 
     def step_4(self, deck):
         '''' Determine the output card '''
-        top_card = deck[0] # AC = 1, not 0
-        bottom_card = deck[51] # KS = 52, not 51
-        return deck[(top_card+bottom_card) % 52]
+        if not self.index_set:
+            self.secret_index = deck[0]-1
+            self.index_set = True
+        return deck[self.secret_index]
 
     def mix_deck(self, deck):
         ''' Execute steps 1-3 without the PRNG '''
