@@ -23,7 +23,6 @@ for key in sorted(counts):
     observed.append(counts[key])
 
 o_values = scipy.array(observed)
-e_values = scipy.array([expected]*52)
-chi = s.chisquare(o_values, f_exp=e_values)
+chi = s.chisquare(o_values)
 
-print("Chi-square: {0:.4f}, p-value: {1:.4f}".format(chi[0], chi[1]))
+print("{0:.4f}, {1:.4f}".format(chi[0], chi[1]))
