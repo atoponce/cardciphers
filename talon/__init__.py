@@ -1,17 +1,39 @@
 import math
 import random
 
-class Cipher:
-    index_set = False
-    secret_index = -1
+class Cipher(object):
+    """ The full algorithm for the Talon playing card cipher PRNG.
+
+    Attributes:
+        secret_index (int): The value of the static secret index of the PRNG.
+        talon_1 (list): The first discard pile
+        talon_2 (list): The second discard pile
+        talon_3 (list): The third discard pile
+        talon_4 (list): The fourth discard pile
+
+    """
+
+    secret_index = 0
 
     def __init__(self):
+        """ Initialize the talons (discard piles) to empty strings """
+
         self.talon_1 = []
         self.talon_2 = []
         self.talon_3 = []
         self.talon_4 = []
 
     def shuffle_deck(self, deck):
+        """ Shuffle the deck randomly with a Fisher-Yates shuffle
+
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
+
+        Returns:
+            list: A randomly shuffled 52-card deck.
+
+        """
+
         i = 52
         while i > 1:
             i = i - 1
@@ -20,7 +42,17 @@ class Cipher:
         return deck
 
     def step_1(self, deck):
-        ''' Create the 4 "talons" '''
+        """ Create the 4 talons (piles) for deck mixing, but do not populate.
+
+        The top card off the deck will create the first talon; the second card
+        will create the second talon; the third card, the third talon; the
+        fourth card, the fourth talon.
+
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
+
+        """
+
         self.talon_1.append(deck[0])
         self.talon_2.append(deck[1])
         self.talon_3.append(deck[2])
@@ -29,7 +61,17 @@ class Cipher:
             deck[0:1] = []
 
     def step_2(self, deck):
-        ''' Populate the 4 "talons" '''
+        """ Populate the 4 talons (piles).
+
+        The first card in each talon determines the size of the talon itself.
+        The value is calculated by taking the face value for that suit. Ace=1
+        and King=13. No more than 13 cards can exist in each of the 4 talons.
+
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
+
+        """
+
         top_card = self.talon_1[0]%13
         if top_card == 0:
             top_card = 13
@@ -59,7 +101,13 @@ class Cipher:
             deck[0:1] = []
 
     def step_3(self, deck):
-        ''' Collect the 4 "talons" into the main deck '''
+        """ Collect the four talons on top of each other in numerical order.
+
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
+
+        """
+
         for i in self.talon_2:
             self.talon_1.append(i)
         for i in self.talon_3:
@@ -70,25 +118,75 @@ class Cipher:
             deck.append(i)
 
     def step_4(self, deck):
-        '''' Determine the output card '''
-        if not self.index_set:
-            self.secret_index = deck[0]-1
-            self.index_set = True
-        return deck[self.secret_index]
+        """ Determine the output card of the generator round.
+
+        For each round required, a pseudorandom number is output, one number
+        per round. The range of the PRNG is [1,52]. The output number is found
+        be reading the value of "self.secret_index". This is found by reading
+        the top card.
+
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
+
+        Returns:
+            int: The deck card value at a static deterministic deck location.
+
+        """
+
+        if not self.secret_index:
+            self.secret_index = deck[0]
+        return deck[self.secret_index-1]
 
     def mix_deck(self, deck):
-        ''' Execute steps 1-3 without the PRNG '''
+        """ Execute the first three steps of the Talon card-cipher algorithm.
+
+        First initialize the talons, then populate the talons, then collect the
+        talons. After which, initialize the talons back to empty lists for the
+        next round.
+
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
+
+        """
+
         self.step_1(deck)
         self.step_2(deck)
         self.step_3(deck)
         self.__init__()
 
     def count_cut(self, deck, index):
-        ''' For keys and IVs only, do a count cut on the deck '''
+        """ For additional mixing of the deck for keys and IVs only.
+
+        Do a count cut on the deck instead of generating an integer output.
+        This is only useful for further mixing of the deck before generating
+        the keystream.
+
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
+            index (int): A location in the deck to perform a standard cut.
+
+        Returns:
+            list: A cut 52-card deck.
+
+        """
+
         cut = (deck[0] + index) % 52
         return deck[cut:] + deck[:cut]
 
     def prng(self, deck):
-        ''' One full round of the Talon algorithm. Outputs a single value. '''
+        """ Mix the deck with the standard algorithm steps, output an integer.
+
+        Mix the deck using steps 1 through 4 of the Talon algorithm. Assume the
+        deck has been keyed and the initialization vector processed already.
+        Output one integer in the range [1,52] for the keystream.
+
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
+
+        Returns:
+            int: One number for the keystream.
+
+        """
+
         self.mix_deck(deck)
         return self.step_4(deck)
