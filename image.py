@@ -1,7 +1,8 @@
+import math
 import talon
 import Image
 
-size = 52*10
+size = 52*30
 t = talon.Cipher()
 d = [i for i in xrange(1,53)]
 
