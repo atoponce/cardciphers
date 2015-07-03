@@ -70,24 +70,31 @@ def _unpad_message(message):
         message = message[:-5]
     return message
 
-def _create_iv():
+def _create_iv(n):
     """ Create a random initialization vector.
 
     Prepend a plaintext message with 5 random characters in the same ciphertext
     character base as the rest of the ciphertext.
 
+    Args:
+        n (int): The number of random characters to generate.
+
+    Returns:
+        str: An initialization vector string.
+
     """
 
     r = random.SystemRandom()
-    return "".join(r.choice(string.ascii_letters) for i in xrange(5))
+    return "".join(r.choice(string.ascii_letters) for i in xrange(n))
 
-def encrypt(message, alg, deck):
+def encrypt(message, alg, deck, n):
     """ Encrypt a plaintext message.
 
     Args:
         message (str): The plaintext message.
         alg (object): The specific cipher object.
         deck (list): A full 52-card deck. State is maintained.
+        n (int): The number of initialization vector characters to generate.
 
     Returns:
         str: An encrypted message prepended with an initialization vector.
@@ -95,7 +102,7 @@ def encrypt(message, alg, deck):
     """
 
     ct = []
-    iv = _create_iv()
+    iv = _create_iv(n)
     
     for char in message:
         if not char in plist:
@@ -116,21 +123,22 @@ def encrypt(message, alg, deck):
 
     return list(iv) + ct
 
-def decrypt(message, alg, deck):
+def decrypt(message, alg, deck, n):
     """ Decrypt a ciphertext message.
 
     Args:
         message (str): The ciphertext message.
         alg (object): The specific cipher object.
         deck (list): A full 52-card deck. State is maintained.
+        n (int): The number of characters of the initialization vector.
 
     Returns:
         str: An decrypted message without the initialization vector.
 
     """
     pt = []
-    iv = message[:5]
-    message = message[5:]
+    iv = message[:n]
+    message = message[n:]
 
     for char in iv:
         alg.mix_deck(deck)
