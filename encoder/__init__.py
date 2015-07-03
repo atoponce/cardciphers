@@ -4,13 +4,35 @@ import string
 plist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%&()-=+:,./? ')
 clist = list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
 
-def get_keystream(message, alg, deck):
+def _get_keystream(message, alg, deck):
+    """ Generate a pseudorandom keystream of integers
+
+    Args:
+        message (str): The full plaintext or ciphertext message.
+        alg (object): The specific cipher object.
+        deck (list): A full 52-card deck. State is maintained.
+
+    Returns:
+        list: A list pseudorandom numbers
+
+    """
+
     outs = []
     for i in xrange(len(message)):
         outs.append(alg.prng(deck))
     return outs
     
-def pad_message(message):
+def _pad_message(message):
+    """ A PKCS#7 padding implementation for the end of the plaintext message.
+
+    Args:
+        message (str): The full plaintext message.
+
+    Returns:
+        str: A PKCS#7 padded message.
+
+    """
+
     pad = len(message) % 5
     if pad is 0:
         message += '55555'
@@ -24,7 +46,17 @@ def pad_message(message):
         message += '1'
     return message
 
-def unpad_message(message):
+def _unpad_message(message):
+    """ Remove the padding off a decrypted ciphertext message.
+
+    Args:
+        message (str): The full decrypted ciphertext message.
+
+    Returns:
+        str: The decrypted message without PKCS#7 padding.
+
+    """
+
     pad = message[-1:]
     if '1' in pad:
         message = message[:-1]
@@ -38,13 +70,32 @@ def unpad_message(message):
         message = message[:-5]
     return message
 
-def create_iv():
+def _create_iv():
+    """ Create a random initialization vector.
+
+    Prepend a plaintext message with 5 random characters in the same ciphertext
+    character base as the rest of the ciphertext.
+
+    """
+
     r = random.SystemRandom()
     return "".join(r.choice(string.ascii_letters) for i in xrange(5))
 
 def encrypt(message, alg, deck):
+    """ Encrypt a plaintext message.
+
+    Args:
+        message (str): The plaintext message.
+        alg (object): The specific cipher object.
+        deck (list): A full 52-card deck. State is maintained.
+
+    Returns:
+        str: An encrypted message prepended with an initialization vector.
+
+    """
+
     ct = []
-    iv = create_iv()
+    iv = _create_iv()
     
     for char in message:
         if not char in plist:
@@ -54,8 +105,8 @@ def encrypt(message, alg, deck):
         alg.mix_deck(deck)
         deck = alg.count_cut(deck, clist.index(char) + 1)
 
-    message = pad_message(message)
-    keystream = get_keystream(message, alg, deck)
+    message = _pad_message(message)
+    keystream = _get_keystream(message, alg, deck)
 
     for num, char in zip(keystream, message):
         ct.append((num + plist.index(char)) % 52)
@@ -66,6 +117,17 @@ def encrypt(message, alg, deck):
     return list(iv) + ct
 
 def decrypt(message, alg, deck):
+    """ Decrypt a ciphertext message.
+
+    Args:
+        message (str): The ciphertext message.
+        alg (object): The specific cipher object.
+        deck (list): A full 52-card deck. State is maintained.
+
+    Returns:
+        str: An decrypted message without the initialization vector.
+
+    """
     pt = []
     iv = message[:5]
     message = message[5:]
@@ -74,7 +136,7 @@ def decrypt(message, alg, deck):
         alg.mix_deck(deck)
         deck = alg.count_cut(deck, clist.index(char) + 1)
 
-    keystream = get_keystream(message, alg, deck)
+    keystream = _get_keystream(message, alg, deck)
 
     for num, char in zip(keystream, message):
         pt.append(((clist.index(char)) - num) % 52)
@@ -82,4 +144,4 @@ def decrypt(message, alg, deck):
     for index, value in enumerate(pt):
         pt[index] = plist[value]
 
-    return unpad_message(pt)
+    return _unpad_message(pt)
