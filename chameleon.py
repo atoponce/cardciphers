@@ -1,9 +1,13 @@
 import card_chameleon
 
-deck = [i for i in xrange(1,53)]
-
 c = card_chameleon.Cipher()
+deck = [i for i in xrange(1,53)]
+c._prepare_deck(deck)
 
-c.shuffle_deck(deck)
+def encrypt(deck, letter):
+    return c.prng(deck, letter)
 
-print deck
+def decrypt(deck, letter):
+    return c.prng(deck, letter)
+
+print decrypt(deck,'A')
