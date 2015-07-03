@@ -23,25 +23,7 @@ class Cipher(object):
         self.talon_3 = []
         self.talon_4 = []
 
-    def shuffle_deck(self, deck):
-        """ Shuffle the deck randomly with a Fisher-Yates shuffle
-
-        Args:
-            deck (list): A full 52-card deck. State is maintained.
-
-        Returns:
-            list: A randomly shuffled 52-card deck.
-
-        """
-
-        i = 52
-        while i > 1:
-            i = i - 1
-            j = int(math.floor(random.SystemRandom().random()*i))
-            deck[j], deck[i] = deck[i], deck[j]
-        return deck
-
-    def step_1(self, deck):
+    def _step_1(self, deck):
         """ Create the 4 talons (piles) for deck mixing, but do not populate.
 
         The top card off the deck will create the first talon; the second card
@@ -60,7 +42,7 @@ class Cipher(object):
         for i in xrange(4):
             deck[0:1] = []
 
-    def step_2(self, deck):
+    def _step_2(self, deck):
         """ Populate the 4 talons (piles).
 
         The first card in each talon determines the size of the talon itself.
@@ -100,7 +82,7 @@ class Cipher(object):
             self.talon_4.insert(0, deck[0])
             deck[0:1] = []
 
-    def step_3(self, deck):
+    def _step_3(self, deck):
         """ Collect the four talons on top of each other in numerical order.
 
         Args:
@@ -117,7 +99,7 @@ class Cipher(object):
         for i in self.talon_1:
             deck.append(i)
 
-    def step_4(self, deck):
+    def _step_4(self, deck):
         """ Determine the output card of the generator round.
 
         For each round required, a pseudorandom number is output, one number
@@ -137,6 +119,23 @@ class Cipher(object):
             self.secret_index = deck[0]
         return deck[self.secret_index-1]
 
+    def shuffle_deck(self, deck):
+        """ Shuffle the deck randomly with a Fisher-Yates shuffle
+
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
+
+        Returns:
+            list: A randomly shuffled 52-card deck.
+
+        """
+
+        i = 52
+        while i > 1:
+            i = i - 1
+            j = int(math.floor(random.SystemRandom().random()*i))
+            deck[j], deck[i] = deck[i], deck[j]
+
     def mix_deck(self, deck):
         """ Execute the first three steps of the Talon card-cipher algorithm.
 
@@ -149,9 +148,9 @@ class Cipher(object):
 
         """
 
-        self.step_1(deck)
-        self.step_2(deck)
-        self.step_3(deck)
+        self._step_1(deck)
+        self._step_2(deck)
+        self._step_3(deck)
         self.__init__()
 
     def count_cut(self, deck, index):
@@ -189,4 +188,4 @@ class Cipher(object):
         """
 
         self.mix_deck(deck)
-        return self.step_4(deck)
+        return self._step_4(deck)
