@@ -129,7 +129,7 @@ class Cipher(object):
             b1 = self._find_black_card(deck, letter) # deck location
             r1 = deck[b1-1] # card value
             b2 = self._find_black_card(deck, self.red_letters[r1]) # deck location
-            r2 = deck[b1-1] # card value
+            r2 = deck[b2-1] # card value
             self.mix_deck(deck, deck.index(r2))
             return self.red_letters[r2]
 
