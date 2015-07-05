@@ -1,33 +1,79 @@
+#!/usr/bin/python
+
 import card_chameleon
+import encoder
+import argparse
 
-c = card_chameleon.Cipher()
-plaintext = "A"*260000
-ciphertext = ""
+parser = argparse.ArgumentParser(description='Python implementation of Talon')
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument('-d', '--decrypt', help='Decrypt a message')
+group.add_argument('-e', '--encrypt', help='Encrypt a message')
+parser.add_argument('-p', '--passphrase', help='Private passphrase to key deck')
+parser.add_argument('-k', '--key', help='Private comma-separated deck order.')
+args = parser.parse_args()
 
-def reset_deck():
-    deck = [i for i in xrange(1,53)]
-    c._prepare_deck(deck)
-    return deck
-    
-def encrypt(deck, letter):
-    return c.prng(deck, letter)
+last = -1
+coincidences = 0
+alg = card_chameleon.Cipher()
 
-def decrypt(deck, letter):
-    return c.prng(deck, letter)
+deck = [i for i in xrange(1,53)]
+alg.prepare_deck(deck)
 
-deck = reset_deck()
-#c.shuffle_deck(deck)
+if args.key:
+    deck = []
+    cards = args.key.split(',')
 
-for char in plaintext:
-    ciphertext += encrypt(deck,char)
+    if not ',' in args.key:
+        parser.error('All 52 cards must be comma-separated.')
 
-print ciphertext
+    if not args.key.replace(' ','').replace(',','').isdigit():
+        parser.error('The deck must uniquely comprise of digits 1-52.')
 
-plaintext = ""
-print ""
+    # bulid deck
+    for card in cards:
+        deck.append(int(card))
 
-deck = reset_deck()
-for char in ciphertext:
-   plaintext += decrypt(deck,char)
+    # more tests
+    if len(deck) != 52:
+        parser.error('The deck must be exactly 52 cards in total.')
 
-#print plaintext
+    if sorted(deck)[0] < 1 or sorted(deck)[51] > 52:
+        parser.error('The deck must use uniquely the values 1-52 inclusively.')
+
+    for card in deck:
+        out = card
+        if out == last:
+            coincidences += 1
+        last = out
+
+    if coincidences:
+        parser.error('The deck must contain all unique values of 1-52.')
+
+if args.passphrase:
+    passphrase = args.passphrase.upper()
+    for char in passphrase:
+        alg.prng(deck, char, iv=True)
+
+if args.encrypt:
+    plaintext = args.encrypt.upper()
+    encrypted = encoder.encrypt(plaintext, alg, deck, 26)
+
+    ciphertext = ''
+    for index, char in enumerate(encrypted):
+        if index % 5 < 4:
+            ciphertext += char
+        else:
+            ciphertext += char + ' '
+    print(ciphertext)
+
+elif args.decrypt:
+    ciphertext = args.decrypt.replace(' ','')
+    decrypted = encoder.decrypt(ciphertext, alg, deck, 26)
+
+    plaintext = ''
+    for char in decrypted:
+        plaintext += char
+    print(plaintext)
+
+else:
+    print('-e|--encrypt or -d|--decrypt is required')

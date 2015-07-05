@@ -64,7 +64,7 @@ class Cipher(object):
 
         return deck.index(self.red_values[letter])
 
-    def _prepare_deck(self, deck):
+    def prepare_deck(self, deck):
         """ Prepares the deck for strictly alternating red/black cards
 
         Args:
@@ -122,16 +122,15 @@ class Cipher(object):
         deck.pop(1)
         deck.pop(0)
 
-    def prng(self, deck, letter, iv=False):
+    def prng(self, deck, letter, iv=False, method='encrypt'):
         """ """
 
         b1 = None
         b2 = None
         r1 = None
         r2 = None
-        called_method = sys._getframe().f_back.f_code.co_name
 
-        if called_method == 'encrypt':
+        if method == 'encrypt':
             b1 = self._find_black_card(deck, letter) # deck location
             r1 = deck[b1-1] # card value
             b2 = self._find_black_card(deck, self.red_letters[r1]) # deck location
@@ -139,7 +138,7 @@ class Cipher(object):
             self.mix_deck(deck, deck.index(r2), iv)
             return self.red_letters[r2]
 
-        elif called_method == 'decrypt':
+        elif method == 'decrypt':
             r1 = self._find_red_card(deck, letter) # deck location
             b1 = deck[r1+1] # card value
             r2 = self._find_red_card(deck, self.black_letters[b1]) # deck location
