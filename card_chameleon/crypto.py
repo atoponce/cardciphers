@@ -17,6 +17,7 @@ coincidences = 0
 alg = card_chameleon.Cipher()
 
 deck = [i for i in xrange(1,53)]
+#alg.shuffle_deck(deck)
 alg.prepare_deck(deck)
 
 if args.key:
@@ -50,7 +51,7 @@ if args.key:
         parser.error('The deck must contain all unique values of 1-52.')
 
 if args.passphrase:
-    passphrase = args.passphrase.upper()
+    passphrase = args.passphrase.upper().replace(' ','')
     for char in passphrase:
         alg.prng(deck, char, iv=True)
 
