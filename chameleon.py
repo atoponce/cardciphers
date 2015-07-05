@@ -1,7 +1,8 @@
 import card_chameleon
 
 c = card_chameleon.Cipher()
-string = ""
+plaintext = "A"*260000
+ciphertext = ""
 
 def reset_deck():
     deck = [i for i in xrange(1,53)]
@@ -15,17 +16,18 @@ def decrypt(deck, letter):
     return c.prng(deck, letter)
 
 deck = reset_deck()
-for char in "AARON":
-    string += encrypt(deck,char)
-    print deck
+c.shuffle_deck(deck)
 
-print string
+for char in plaintext:
+    ciphertext += encrypt(deck,char)
 
-string = ""
+print ciphertext
+
+plaintext = ""
 print ""
 
 deck = reset_deck()
-for char in "AARNA":
-    string += decrypt(deck,char)
+for char in ciphertext:
+   plaintext += decrypt(deck,char)
 
-print string
+#print plaintext
