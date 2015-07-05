@@ -36,29 +36,6 @@ class Cipher(object):
              8:'U', 9:'V',10:'W',11:'X',12:'Y',13:'Z'
         }
 
-    def _prepare_deck(self, deck):
-        """ Prepares the deck for strictly alternating red/black cards
-
-        Args:
-            deck (list): A full 52-card deck. State is maintained.
-
-        """
-
-        black_pile = []
-        red_pile = []
-
-        for card in deck:
-            if 14 <= card <= 39: # diamonds through hearts
-                red_pile.insert(0, card)
-            else: # clubs and spades
-                black_pile.insert(0, card)
-
-        for i in xrange(26):
-            deck.insert(0, black_pile[i])
-            deck.insert(0, red_pile[i])
-            deck.pop(53)
-            deck.pop(52)
-
     def _find_black_card(self, deck, letter):
         """ Find the black card in the deck matching the supplied letter
         
@@ -87,6 +64,29 @@ class Cipher(object):
 
         return deck.index(self.red_values[letter])
 
+    def _prepare_deck(self, deck):
+        """ Prepares the deck for strictly alternating red/black cards
+
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
+
+        """
+
+        black_pile = []
+        red_pile = []
+
+        for card in deck:
+            if 14 <= card <= 39: # diamonds through hearts
+                red_pile.insert(0, card)
+            else: # clubs and spades
+                black_pile.insert(0, card)
+
+        for i in xrange(26):
+            deck.insert(0, black_pile[i])
+            deck.insert(0, red_pile[i])
+            deck.pop(53)
+            deck.pop(52)
+
     def shuffle_deck(self, deck):
         """ Shuffle the deck randomly with a Fisher-Yates shuffle
 
@@ -100,9 +100,8 @@ class Cipher(object):
             i = i - 1
             j = int(math.floor(random.SystemRandom().random()*i))
             deck[j], deck[i] = deck[i], deck[j]
-        self._prepare_deck(deck)
 
-    def mix_deck(self, deck, location):
+    def mix_deck(self, deck, location, iv=False):
         """ Swap the red card corresponding to the message with the top card
 
         Args:
@@ -111,12 +110,19 @@ class Cipher(object):
 
         deck[0], deck[location] = deck[location], deck[0]
 
+        if iv:
+            # append [loc, loc+1] to bottom
+            deck.append(deck[location])
+            deck.append(deck[location+1])
+            deck.pop(location+1)
+            deck.pop(location)
+
         deck.append(deck[0])
         deck.append(deck[1])
         deck.pop(1)
         deck.pop(0)
 
-    def prng(self, deck, letter):
+    def prng(self, deck, letter, iv=False):
         """ """
 
         b1 = None
@@ -130,7 +136,7 @@ class Cipher(object):
             r1 = deck[b1-1] # card value
             b2 = self._find_black_card(deck, self.red_letters[r1]) # deck location
             r2 = deck[b2-1] # card value
-            self.mix_deck(deck, deck.index(r2))
+            self.mix_deck(deck, deck.index(r2), iv)
             return self.red_letters[r2]
 
         elif called_method == 'decrypt':
@@ -138,5 +144,5 @@ class Cipher(object):
             b1 = deck[r1+1] # card value
             r2 = self._find_red_card(deck, self.black_letters[b1]) # deck location
             b2 = deck[r2+1] # card value
-            self.mix_deck(deck, r1)
+            self.mix_deck(deck, r1, iv)
             return self.black_letters[b2]

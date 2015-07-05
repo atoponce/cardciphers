@@ -119,7 +119,17 @@ class Cipher(object):
             self.secret_index = deck[0]
         return deck[self.secret_index-1]
 
-    def shuffle_deck(self, deck):
+    def prepare_deck(self, deck):
+        """ No additional processing needs to be done for the Talon cipher
+
+        Returns:
+            bool: Returns True. Nothing to be done here
+
+        """
+
+        return True
+
+    def shuffle_deck(self):
         """ Shuffle the deck randomly with a Fisher-Yates shuffle
 
         Args:

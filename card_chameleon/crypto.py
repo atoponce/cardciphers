@@ -16,7 +16,7 @@ def decrypt(deck, letter):
     return c.prng(deck, letter)
 
 deck = reset_deck()
-c.shuffle_deck(deck)
+#c.shuffle_deck(deck)
 
 for char in plaintext:
     ciphertext += encrypt(deck,char)

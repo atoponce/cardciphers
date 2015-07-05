@@ -15,6 +15,7 @@ args = parser.parse_args()
 last = -1
 coincidences = 0
 alg = talon.Cipher()
+
 deck = [i for i in xrange(1,53)]
 
 if args.key:
