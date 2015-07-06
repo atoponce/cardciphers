@@ -3,10 +3,18 @@ import math
 import random
 
 class Cipher(object):
-    """ """
+    """ The full algorithm for the Card-Chameleon playing card cipher.
+    
+    Attributes:
+        red_values (dict): Red letters-to-values
+        red_letters (dict): Red values-to-letters
+        black_values (dict): Black letters-to-values
+        black_letters (dict): Black values-to-letters
+
+    """
 
     def __init__(self):
-        """ """
+        """ Initialize the lookup dictionaries for the algorithm."""
 
         self.red_values = {
             'A':27,'B':28,'C':29,'D':30,'E':31,'F':32,'G':33,
@@ -104,7 +112,21 @@ class Cipher(object):
     def mix_deck(self, deck, location, iv=False):
         """ Swap the red card corresponding to the message with the top card
 
+        Deck mixing happens one of two ways- using the passphrase/IV card
+        swapping, or just standard encryption/decryption. If a passphrase is
+        provided, the algorithm for the IV is used for mixing the deck, and
+        "iv=True" must be set.
+
+        First, the top card is always swapped with the ciphertext character
+        (whether encrypting or decrypting). If "iv=True", then the ciphertext
+        card and it's black pairing are appended to the bottom of the deck. The
+        top two cards are always appended to the bottom of the deck at the end
+        of the algorithm.
+
         Args:
+            deck (list): A full 52-card deck. State is maintained.
+            location (int): The location in the deck for IV card swapping.
+            iv (bool): Mix the deck with the IV. Default: False.
         
         """
 
@@ -123,7 +145,23 @@ class Cipher(object):
         deck.pop(0)
 
     def prng(self, deck, letter, iv=False, method='encrypt'):
-        """ """
+        """ Find the ciphertext or plaintext while also mixing the deck.
+
+        Two separate algorithms are needed:
+
+            If encrypting: find the black card first.
+            If decrypting: find the red card first.
+
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
+            letter (char): A single character to be encrypted/decrypted.
+            iv (bool): Mix the deck with the IV. Default: False
+            method (str): Either method='encrypt' or method='decrypt'.
+
+        Returns:
+            char: Either the ciphertext or plaintext character.
+        
+        """
 
         b1 = None
         b2 = None
