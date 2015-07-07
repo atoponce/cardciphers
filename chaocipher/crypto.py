@@ -53,7 +53,7 @@ if args.key:
 if args.passphrase:
     passphrase = args.passphrase.upper().replace(' ','')
     for char in passphrase:
-        alg.prng(deck, char, iv=True)
+        alg.prng(deck, char)
 
 if args.encrypt:
     plaintext = args.encrypt.upper()
