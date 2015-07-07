@@ -1,102 +1,203 @@
-#deck = [i for i in xrange(1,53)]
-deck = [34, 24, 21, 29, 26, 22, 27, 39, 30, 19, 38, 37, 16, 31, 32, 36, 18, 35, 33, 20, 23, 15, 28, 14, 25, 17, 3, 7, 51, 1, 41, 4, 43, 44, 2, 12, 6, 45, 40, 9, 13, 50, 46, 49, 5, 48, 47, 10, 11, 8, 52, 42]
-keyphrase = 'WELLDONEISBETTERTHANWELLSAID'
-r_alph = ""
-l_alph = ""
-ct = ""
-pt = ""
+import math
+import random
 
-left_values = {
-    'A':27,'B':28,'C':29,'D':30,'E':31,'F':32,'G':33,
-    'H':34,'I':35,'J':36,'K':37,'L':38,'M':39,
-    'N':14,'O':15,'P':16,'Q':17,'R':18,'S':19,'T':20,
-    'U':21,'V':22,'W':23,'X':24,'Y':25,'Z':26
-}
+class Cipher(object):
+    """ The full algorithm for the Card-Chameleon playing card cipher.
+    
+    Attributes:
+        left_values (dict): Left letters-to-values
+        left_letters (dict): Left values-to-letters
+        right_values (dict): Right letters-to-values
+        right_letters (dict): Right values-to-letters
 
-left_letters = {
-    27:'A',28:'B',29:'C',30:'D',31:'E',32:'F',33:'G',
-    34:'H',35:'I',36:'J',37:'K',38:'L',39:'M',
-    14:'N',15:'O',16:'P',17:'Q',18:'R',19:'S',20:'T',
-    21:'U',22:'V',23:'W',24:'X',25:'Y',26:'Z'
-}
+    """
 
-right_values = {
-    'A':40,'B':41,'C':42,'D':43,'E':44,'F':45,'G':46,
-    'H':47,'I':48,'J':49,'K':50,'L':51,'M':52,
-    'N': 1,'O': 2,'P': 3,'Q': 4,'R': 5,'S': 6,'T': 7,
-    'U': 8,'V': 9,'W':10,'X':11,'Y':12,'Z':13
-}
+    def __init__(self):
+        """ Initialize the lookup dictionaries for the algorithm."""
 
-right_letters = {
-    40:'A',41:'B',42:'C',43:'D',44:'E',45:'F',46:'G',
-    47:'H',48:'I',49:'J',50:'K',51:'L',52:'M',
-     1:'N', 2:'O', 3:'P', 4:'Q', 5:'R', 6:'S', 7:'T',
-     8:'U', 9:'V',10:'W',11:'X',12:'Y',13:'Z'
-}
+        self.left_values = {
+            'A':27,'B':28,'C':29,'D':30,'E':31,'F':32,'G':33,
+            'H':34,'I':35,'J':36,'K':37,'L':38,'M':39,
+            'N':14,'O':15,'P':16,'Q':17,'R':18,'S':19,'T':20,
+            'U':21,'V':22,'W':23,'X':24,'Y':25,'Z':26
+        }
 
-def create_piles(deck):
-    left = []
-    right = []
+        self.left_letters = {
+            27:'A',28:'B',29:'C',30:'D',31:'E',32:'F',33:'G',
+            34:'H',35:'I',36:'J',37:'K',38:'L',39:'M',
+            14:'N',15:'O',16:'P',17:'Q',18:'R',19:'S',20:'T',
+            21:'U',22:'V',23:'W',24:'X',25:'Y',26:'Z'
+        }
+        self.right_values = {
+            'A':40,'B':41,'C':42,'D':43,'E':44,'F':45,'G':46,
+            'H':47,'I':48,'J':49,'K':50,'L':51,'M':52,
+            'N': 1,'O': 2,'P': 3,'Q': 4,'R': 5,'S': 6,'T': 7,
+            'U': 8,'V': 9,'W':10,'X':11,'Y':12,'Z':13
+        }
 
-    for card in deck:
-        if 14 <= card <= 39:
-            left.append(card)
+        self.right_letters = {
+            40:'A',41:'B',42:'C',43:'D',44:'E',45:'F',46:'G',
+            47:'H',48:'I',49:'J',50:'K',51:'L',52:'M',
+             1:'N', 2:'O', 3:'P', 4:'Q', 5:'R', 6:'S', 7:'T',
+             8:'U', 9:'V',10:'W',11:'X',12:'Y',13:'Z'
+        }
+
+    def _find_plaintext_char(self, deck, char=None, loc=None):
+        """ Find the plaintext character or location in the right pile
+
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
+            char (char): A single character to find. Defaults to None.
+            loc (int): A location in the deck. Defaults to None.
+
+        Returns:
+            char: The plaintext character.
+            int: The location in the deck of the plainetxt character.
+
+        """
+
+        right = deck[26:]
+
+        if loc is not None:
+            return self.right_letters[right[loc]]
         else:
-            right.append(card)
-    return left, right
+            return right.index(self.right_values[char])
 
-def permute_piles(deck, cut):
-    left = create_piles(deck)[0]
-    right = create_piles(deck)[1]
+    def _find_ciphertext_char(self, deck, char=None, loc=None):
+        """ Find the ciphertext character or location in the left pile
 
-    # permute the left pile
-    left = left[cut:] + left[:cut] # cut the pile at the ciphertext card
-    left.insert(14, left[1]) # insert the nadir + 1 card at the nadir of the pile
-    left.pop(1) # remove the new zenith + 1 card from the pile
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
+            char (char): A single character to find. Defaults to None.
+            loc (int): A location in the deck. Defaults to None.
 
-    # permute the right pile
-    right = right[cut:] + right[:cut]
-    right.append(right[0]) # move the card at the zenith to the bottom of the pile
-    right.pop(0)
-    right.insert(14, right[2]) # insert the zenith + 2 card at the nadir of the pile
-    right.pop(2) # remove the new zenith + 2 card from the pile
+        Returns:
+            char: The ciphertext character.
+            int: The location in the deck of the ciphertext character.
 
-    return left + right
+        """
 
-def find_plaintext_char(deck, char=None, loc=None):
-    right = create_piles(deck)[1]
-    if loc is not None:
-        return right_letters[right[loc]]
-    else:
-        return right.index(right_values[char])
+        left = deck[:26]
+        
+        if loc is not None:
+            return self.left_letters[left[loc]]
+        else:
+            return left.index(self.left_values[char])
 
-def find_ciphertext_char(deck, char=None, loc=None):
-    left = create_piles(deck)[0]
-    if loc is not None:
-        return left_letters[left[loc]]
-    else:
-        return left.index(left_values[char])
+    def prepare_deck(self, deck):
+        """ Prepares the right and left piles
 
-for c in list(keyphrase):
-    l = find_plaintext_char(deck, char=c)
-    ct += find_ciphertext_char(deck, loc=l)
-    deck = permute_piles(deck, l)
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
 
-left = create_piles(deck)[0]
-right = create_piles(deck)[1]
+        Returns:
+            tuple: The left and right alphabets (deck piles of 26-cards).
 
-for card in right:
-    r_alph += right_letters[card]
+        """
 
-for card in left:
-    l_alph += left_letters[card]
+        left = []
+        right = []
 
-deck = [34, 24, 21, 29, 26, 22, 27, 39, 30, 19, 38, 37, 16, 31, 32, 36, 18, 35, 33, 20, 23, 15, 28, 14, 25, 17, 3, 7, 51, 1, 41, 4, 43, 44, 2, 12, 6, 45, 40, 9, 13, 50, 46, 49, 5, 48, 47, 10, 11, 8, 52, 42]
+        for card in deck:
+            if 14 <= card <= 39:
+                left.insert(0, card)
+            else:
+                right.insert(0, card)
 
-for c in list(ct):
-    l = find_ciphertext_char(deck, char=c)
-    pt += find_plaintext_char(deck, loc=l)
-    deck = permute_piles(deck, l)
+        for i in xrange(26):
+            deck.insert(0, right[i])
+            deck.pop(52)
 
-print pt
-print ct
+        for i in xrange(26):
+            deck.insert(0, left[i])
+            deck.pop(52)
+
+    def shuffle_deck(self, deck):
+        """ Shuffle the deck randomly with a Fisher-Yates shuffle
+
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
+
+        """
+
+        i = 52
+        while i > 1:
+            i = i - 1
+            j = int(math.floor(random.SystemRandom().random()*i))
+            deck[j], deck[i] = deck[i], deck[j]
+
+    def mix_deck(self, deck, cut):
+        """ The difussion/permutation steps of the Chaocipher algorithm.
+
+        Deck mixing happens by first identifying the left (ciphertext) and
+        right (plaintext) alphabets. First, the plaintext or ciphertext
+        character is identified.
+
+        The left deck is mixed by:
+            * cutting the deck at the ciphertext card putting it on the zenith.
+            * inserting the zenith + 1 card into the nadir
+
+        The right deck is mixed by:
+            * cutting the deck at the plaintext card putting it on the zenith.
+            * moving the zenith to the bottom of the deck
+            * inserting the new zenith + 2 card into the nadir
+
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
+            cut (int): The location in either pile to cut the pile at.
+
+        Returns:
+            list: A full 52-card deck with the left pile on top of the right.
+
+        """
+
+        left = deck[:26]
+        right = deck[26:]
+
+        left = left[cut:] + left[:cut]
+        left.insert(14, left[1])
+        left.pop(1)
+
+        right = right[cut:] + right[:cut]
+        right.append(right[0])
+        right.pop(0)
+        right.insert(14, right[2])
+        right.pop(2)
+
+        for char in left:
+            deck.append(char)
+            deck.pop(0)
+
+        for char in right:
+            deck.append(char)
+            deck.pop(0)
+
+    def prng(self, deck, letter, method='encrypt'):
+        """ Find the ciphertext or plaintext while also mixing the deck.
+
+        Two separate algorithms are needed:
+
+            If encrypting: find the right plaintext card first.
+            If decrypting: find the left ciphertext  card first.
+
+        Args:
+            deck (list): A full 52-card deck. State is maintained.
+            letter (char): A single character to be encrypted/decrypted.
+            method (str): Either method='encrypt' or method='decrypt'.
+
+        Returns:
+            char: Either the ciphertext or plaintext character.
+        
+        """
+
+        if method == 'encrypt':
+            l = self._find_plaintext_char(deck, char=letter)
+            char = self._find_ciphertext_char(deck, loc=l)
+            self.mix_deck(deck, l)
+
+        elif method == 'decrypt':
+            l = self._find_ciphertext_char(deck, char=letter)
+            char = self._find_plaintext_char(deck, loc=l)
+            self.mix_deck(deck, l)
+
+        return char
