@@ -45,7 +45,7 @@ def _unpad_message(message):
         message = message[:-3]
     elif 'Y' in pad:
         message = message[:-4]
-    else:
+    elif 'Z' in pad:
         message = message[:-5]
     return message
 
