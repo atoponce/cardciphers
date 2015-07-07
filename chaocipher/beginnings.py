@@ -15,16 +15,8 @@ for card in deck:
     print cards[card-1],
 
 print "\n"
-left = []
-right = []
 
-for card in deck:
-    if 14 <= card <= 39:
-        left.append(card)
-    else:
-        right.append(card)
-
-deck = left + right
+c.prepare_deck(deck)
 
 print "Unkeyed Chaocipher deck (left on-top-of right):"
 for card in deck:
