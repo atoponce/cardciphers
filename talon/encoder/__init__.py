@@ -66,7 +66,7 @@ def _unpad_message(message):
         message = message[:-3]
     elif '4' in pad:
         message = message[:-4]
-    else:
+    elif '5' in pad:
         message = message[:-5]
     return message
 
