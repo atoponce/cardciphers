@@ -49,31 +49,28 @@ def _unpad_message(message):
         message = message[:-5]
     return message
 
-def _create_iv(n):
+def _create_iv():
     """ Create a random initialization vector.
 
     Prepend a plaintext message with 5 random characters in the same ciphertext
     character base as the rest of the ciphertext.
-
-    Args:
-        n (int): The number of random characters to generate.
 
     Returns:
         str: An initialization vector string.
 
     """
 
+    chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     r = random.SystemRandom()
-    return "".join(r.choice(string.uppercase) for i in xrange(n))
+    return ''.join(r.sample(chars, len(chars)))
 
-def encrypt(message, alg, deck, n):
+def encrypt(message, alg, deck):
     """ Encrypt a plaintext message.
 
     Args:
         message (str): The plaintext message.
         alg (object): The specific cipher object.
         deck (list): A full 52-card deck. State is maintained.
-        n (int): The number of initialization vector characters to generate.
 
     Returns:
         str: An encrypted message prepended with an initialization vector.
@@ -81,7 +78,7 @@ def encrypt(message, alg, deck, n):
     """
 
     ct = []
-    iv = _create_iv(n)
+    iv = _create_iv()
 
     for char in message:
         if not char in list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
@@ -99,22 +96,21 @@ def encrypt(message, alg, deck, n):
 
     return list(iv) + ct
 
-def decrypt(message, alg, deck, n):
+def decrypt(message, alg, deck):
     """ Decrypt a ciphertext message.
 
     Args:
         message (str): The ciphertext message.
         alg (object): The specific cipher object.
         deck (list): A full 52-card deck. State is maintained.
-        n (int): The number of characters of the initialization vector.
 
     Returns:
         str: An decrypted message without the initialization vector.
 
     """
     pt = []
-    iv = message[:n]
-    message = message[n:]
+    iv = message[:26]
+    message = message[26:]
 
     for char in iv:
         alg.prng(deck, char, iv=True)
