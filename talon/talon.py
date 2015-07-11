@@ -129,7 +129,7 @@ class Cipher(object):
 
         return True
 
-    def shuffle_deck(self):
+    def shuffle_deck(self, deck):
         """ Shuffle the deck randomly with a Fisher-Yates shuffle
 
         Args:
