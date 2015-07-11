@@ -2,7 +2,6 @@ import talon
 
 t = talon.Cipher()
 d = [i for i in xrange(1,53)] # must fill with values 1-52
-t.shuffle_deck(d)
 
 faces = [None] * 52
 cards = (

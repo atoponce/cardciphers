@@ -13,4 +13,4 @@ for x in xrange(size):
         if n % 2 == 0:
             pic.putpixel((x,y), (255,255,255))
 
-pic.save('talon.png')
+pic.save('random.png')
