@@ -2,19 +2,11 @@ import math
 import random
 
 class Cipher(object):
-    """ The full algorithm for the Solitare playing card cipher.
-
-    Attributes:
-        j (int): A running total in the RC4 algorithm
-        red_values (dict): Red letters-to-values
-        red_letters (dict): Red values-to-letters
-        black_values (dict): Black letters-to-values
-        black_letters (dict): Black values-to-letters
-
-    """
+    """ The full algorithm for the Solitare playing card cipher. """
 
     def __init__(self):
         """ Initialize the lookup dictionaries for the algorithm."""
+        pass
 
     def shuffle_deck(self, deck):
         """ Shuffle the deck randomly with a Fisher-Yates shuffle
@@ -93,18 +85,22 @@ class Cipher(object):
         for i in xrange(54):
             deck[i] = tmp[i]
 
-    def _step_four(self, deck):
+    def _step_four(self, deck, char=False):
         """ Perform a count cut
         
         Args:
             deck (list): A full 54-card deck with jokers. State is maintained.
+            char (int): A character location in the deck for passphrases.
 
         """
 
-        count = deck[53]
+        if char:
+            count = char
+        else:
+            count = deck[53]
 
         if count == 53 or count == 54:
-            return True
+            return
 
         cut = deck[:count]
         tmp = deck[count:53] + deck[:count] + [deck[53]]
@@ -112,13 +108,12 @@ class Cipher(object):
         for i in xrange(54):
             deck[i] = tmp[i]
 
-    def mix_deck(self, deck):
+    def mix_deck(self, deck, char=False):
         """ Swap the red card corresponding to the message with the top card
 
         Args:
             deck (list): A full 52-card deck. State is maintained.
-            location (int): The location in the deck for IV card swapping.
-            iv (bool): Mix the deck with the IV. Default: False.
+            char (int): A character location in the deck for passphrases.
         
         """
 
@@ -126,26 +121,31 @@ class Cipher(object):
         self._step_two(deck)
         self._step_three(deck)
         self._step_four(deck)
+        if char:
+            self._step_four(deck, char)
 
-    def prng(self, deck, iv=False):
+    def prng(self, deck):
         """ Mix the deck with the standard algorithm, output an integer.
 
         Args:
             deck (list): A full 52-card deck. State is maintained.
-            iv (bool): Mix the deck with the IV. Default: False
 
         Returns:
-            char: Either the ciphertext or plaintext character.
+            int: One number for the keystream.
         
         """
 
         self.mix_deck(deck)
         top = deck[0]
-        out = deck[top-1]
+        if top == 54:
+            top = 53
+        out = deck[top]
 
         while out == 53 or out == 54:
             self.mix_deck(deck)
             top = deck[0]
-            out = deck[top-1]
+            if top == 54:
+                top = 53
+            out = deck[top]
 
         return out

@@ -1,12 +1,13 @@
-import pocket_rc4
+import solitaire
 import scipy, scipy.stats
 
-t = pocket_rc4.Cipher()
+c = solitaire.Cipher()
 s = scipy.stats
 
-d = [i for i in xrange(1,53)]
-t.prepare_deck(d)
-t.shuffle_deck(d)
+d = [i for i in xrange(1,55)]
+
+for i in xrange(13):
+    c.shuffle_deck(d)
 
 counts = {}
 observed = []
@@ -14,7 +15,7 @@ expected = 10000
 rounds = len(d)*expected
 
 for i in xrange(rounds):
-    n = t.prng(d)
+    n = c.prng(d)
     if n not in counts:
         counts[n] = 1
     else:

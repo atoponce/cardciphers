@@ -69,28 +69,31 @@ def _unpad_message(message):
         message = message[:-5]
     return message
 
-def _create_iv():
+def _create_iv(n):
     """ Create a random initialization vector.
 
     Prepend a plaintext message with 5 random characters in the same ciphertext
     character base as the rest of the ciphertext.
+
+    Args:
+        n (int): The number of random characters to generate
 
     Returns:
         str: An initialization vector string.
 
     """
 
-    chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     r = random.SystemRandom()
-    return ''.join(r.sample(chars, len(chars)))
+    return "".join(r.choice(string.uppercase) for i in xrange(n))
 
-def encrypt(message, alg, deck):
+def encrypt(message, alg, deck, n):
     """ Encrypt a plaintext message.
 
     Args:
         message (str): The plaintext message.
         alg (object): The specific cipher object.
         deck (list): A full 52-card deck. State is maintained.
+        n (int): The number of initialization vector characters to generate.
 
     Returns:
         str: An encrypted message prepended with an initialization vector.
@@ -98,19 +101,18 @@ def encrypt(message, alg, deck):
     """
 
     ct = []
-    iv = _create_iv()
+    iv = _create_iv(n)
 
     for char in message:
-        if not char in list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
+        if not char in clist:
             message = message.replace(char, '')
 
     for char in iv:
-        c_loc = alg.find_black_card(deck, char)
-        alg.mix_deck(deck, c_loc-1, iv=True)
+        alg.mix_deck(deck, char=clist.index(char)+1)
 
     msg = iv + message
     message = _pad_message(msg)
-    message = message[26:] # strip iv for encryption
+    message = message[n:] # strip iv for encryption
     keystream = _get_keystream(message, alg, deck)
 
     for num, char in zip(keystream, message):
@@ -121,25 +123,25 @@ def encrypt(message, alg, deck):
 
     return list(iv) + ct
 
-def decrypt(message, alg, deck):
+def decrypt(message, alg, deck, n):
     """ Decrypt a ciphertext message.
 
     Args:
         message (str): The ciphertext message.
         alg (object): The specific cipher object.
         deck (list): A full 52-card deck. State is maintained.
+        n (int): The number of initialization vector characters to generate.
 
     Returns:
         str: An decrypted message without the initialization vector.
 
     """
     pt = []
-    iv = message[:26]
-    message = message[26:]
+    iv = message[:n]
+    message = message[n:]
 
     for char in iv:
-        c_loc = alg.find_black_card(deck, char)
-        alg.mix_deck(deck, c_loc-1, iv=True)
+        alg.mix_deck(deck, clist.index(char)+1)
 
     keystream = _get_keystream(message, alg, deck)
 

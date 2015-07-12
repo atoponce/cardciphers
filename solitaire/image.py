@@ -1,11 +1,11 @@
 import math
 import Image
-import pocket_rc4
+import solitaire
 
 size = 52*30
-c = pocket_rc4.Cipher()
-d = [i for i in xrange(1,53)]
-c.prepare_deck(d)
+c = solitaire.Cipher()
+d = [i for i in xrange(1,55)]
+
 for i in xrange(13):
     c.shuffle_deck(d)
 

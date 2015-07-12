@@ -1,12 +1,12 @@
-import pocket_rc4
+import solitaire
 
-c = pocket_rc4.Cipher()
+c = solitaire.Cipher()
 
 last = -1
 count = 0
 rounds = 52*10000
-d = [i for i in xrange(1,53)]
-c.prepare_deck(d)
+d = [i for i in xrange(1,55)]
+
 for i in xrange(13):
     c.shuffle_deck(d)
 
