@@ -9,10 +9,10 @@ Talon uses the Bridge ordering of suits. In Contact Bridge, Clubs are
 ranked lowest, followed by Diamonds, then Hearts, with Spades ranked highest.
 As such, Talon uses the following card assignments:
 
-    Clubs: Face value (Ace=1, King=13)
-    Diamonds: Face value + 13
-    Hearts: Face value + 26
-    Spades: Face value + 39
+* Clubs: Face value (Ace=1, King=13)
+* Diamonds: Face value + 13
+* Hearts: Face value + 26
+* Spades: Face value + 39
 
 Or, if you wanted to see them broken down into tables:
 
