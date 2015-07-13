@@ -4,7 +4,7 @@ import encoder
 # setting up the ciphertext
 ciphertext = ''
 keyphrase = 'CARDCIPHERCARDCIPHER'
-plaintext = "JELLYLIKEABOVETHEHIGHWIRESIXQUAKINGPACHYDERMSKEPTTHECLIMAXOFTHEEXTRAVAGANZAINADAZZLINGSTATEOFFLUX"
+plaintext = "ABAB"*25
 plaintext *= 5200
 deck = [i for i in xrange(1,53)]
 
@@ -47,4 +47,4 @@ print("Coincidences: {0}/{1}".format(count, len(ciphertext)))
 print("Index: {0}".format(ic))
 print("Hit Ratio: {0:.12f}".format(ratio))
 print("Expected: {0:.12f}".format(1.0/len(alphabet)))
-print("Bias: 1/{0:.12f}".format(1/ratio))
+print("Bias: 1/{0:.12f}".format(1/ic))
