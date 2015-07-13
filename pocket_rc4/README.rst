@@ -116,8 +116,8 @@ Encryption/Decryption Algorithm
    d. Add the red "t" card to the top card card mod 26.
    
       1. If encrypting, add this value to the plaintext charcter, mod 26.
-      2. If decrypting, subtract this value from the ciphertext character,
-          mod 26.
+      2. If decrypting, subtract this value from the ciphertext character, mod
+         26.
 
    e. Exchange the red "t" card with the top red card.
    f. Move the top two cards (one red, one black) to the bottom of the deck.
