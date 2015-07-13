@@ -70,3 +70,54 @@ Pocket-RC4 requires an initialization vector as part of the algorithm. The
 algorithm can either use the Jokers or not. This implementation does not use
 the Jokers. As such, everything is done modulo 26, and the initialization
 vector must be 26 unique characters in length.
+
+Also, this implementation uses PKCS#7 padding as follows:
+
+* If one padding character is required, append "V".
+* If two padding characters are required, append "WW".
+* If three padding characters are required, append "XXX".
+* If four padding characters are required, append "YYYY".
+* If no padding characters are required, append "ZZZZZ".
+
+In this manner, it is unambiguously clear exactly what is padding and what is
+plaintext. Unfortunately, this increases the message by 1-5 characters in
+length. However, this also allows software algorithms to make a deterministic
+choice on exactly which characters to remove from the decrypted ciphertext
+without affecting the intended message.
+
+Encryption/Decryption Algorithm
+-------------------------------
+
+1. Key the deck, either by random shuffle, or deterministic algorithm.
+2. Deal out two face-up piles- a red pile and a black pile, card-for-card,
+   preserving deck order. Do not place down color groups.
+3. Make a new face-up pile, by interleaving the two piles, starting with the
+   black pile, then the red pile. When finished, the new pile should strictly
+   alternate red and black cards every card, starting with red on the top, and
+   black on the bottom.
+4. Create a 26-unique character initialization vector. Every letter in the
+   26-character Latin alphabet must be represented exactly once. For each
+   character in the IV with the following steps:
+
+   a) Find the black card corresponding to the IV character. Identify this as
+      the letter "t".
+   b) Exchange the red card above this black card with the top red card.
+   c) Move the black card corresponding to "t" and the red card above to the
+      bottom of the deck.
+   d) Move the top two cards (one red, one black) to the bottom of the deck.
+
+5. Pad the IV + plaintext message with PKCS#7 padding as described above.
+6. Set "j" to the value of the bottom red card.
+7. Encrypt each letter in the plaintext with the following steps:
+
+    a) Add the value of the top red card to "j" mod 26.
+    b) Find the black card corresponding to the new "j" value.
+    c) Identify the red card above this plaintext black card as "t".
+    d) Add the red "t" card to the top card card mod 26.
+    
+       i) If encrypting, add this value to the plaintext charcter, mod 26.
+       ii) If decrypting, subtract this value from the ciphertext character,
+           mod 26.
+
+    e) Exchange the red "t" card with the top red card.
+    f) Move the top two cards (one red, one black) to the bottom of the deck.
