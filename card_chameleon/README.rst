@@ -99,7 +99,7 @@ Decryption Algorithm
       bottom of the deck.
    f) Move the top two cards (one red, one black) to the bottom of the deck.
 
-6. Decrypt each letter in the ciphertext with the following steps;
+5. Decrypt each letter in the ciphertext with the following steps;
 
    a) Find the red card corresponding to the ciphertext character. Interpret
       this card as letter "c".
@@ -109,3 +109,5 @@ Decryption Algorithm
       and write it down.
    e) Exchange the first red ciphertext card "c" with the top red card.
    f) Move the top two cards (one red, one black) to the bottom of the deck.
+
+6. Unpad the message using the PKCS#7 padding as described above.
