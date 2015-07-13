@@ -75,7 +75,8 @@ Encryption Algorithm
    e) Exchange this ciphertext red card with the top red card.
    f) Move the top two cards (one red, one black) to the bottom of the deck.
 
-7. Send the message, which has 26 character more than the plaintext.
+7. Prepend the IV to the ciphertext.
+8. Send the message, which has 26 character more than the plaintext.
 
 Decryption Algorithm
 --------------------
