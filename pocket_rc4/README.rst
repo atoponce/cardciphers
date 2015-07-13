@@ -99,25 +99,25 @@ Encryption/Decryption Algorithm
    26-character Latin alphabet must be represented exactly once. For each
    character in the IV with the following steps:
 
-   a) Find the black card corresponding to the IV character. Identify this as
+   a. Find the black card corresponding to the IV character. Identify this as
       the letter "t".
-   b) Exchange the red card above this black card with the top red card.
-   c) Move the black card corresponding to "t" and the red card above to the
+   b. Exchange the red card above this black card with the top red card.
+   c. Move the black card corresponding to "t" and the red card above to the
       bottom of the deck.
-   d) Move the top two cards (one red, one black) to the bottom of the deck.
+   d. Move the top two cards (one red, one black) to the bottom of the deck.
 
 5. Pad the IV + plaintext message with PKCS#7 padding as described above.
 6. Set "j" to the value of the bottom red card.
 7. Encrypt each letter in the plaintext with the following steps:
 
-    a) Add the value of the top red card to "j" mod 26.
-    b) Find the black card corresponding to the new "j" value.
-    c) Identify the red card above this plaintext black card as "t".
-    d) Add the red "t" card to the top card card mod 26.
-    
-       i) If encrypting, add this value to the plaintext charcter, mod 26.
-       ii) If decrypting, subtract this value from the ciphertext character,
-           mod 26.
+   a. Add the value of the top red card to "j" mod 26.
+   b. Find the black card corresponding to the new "j" value.
+   c. Identify the red card above this plaintext black card as "t".
+   d. Add the red "t" card to the top card card mod 26.
+   
+      1. If encrypting, add this value to the plaintext charcter, mod 26.
+      2. If decrypting, subtract this value from the ciphertext character,
+          mod 26.
 
-    e) Exchange the red "t" card with the top red card.
-    f) Move the top two cards (one red, one black) to the bottom of the deck.
+   e. Exchange the red "t" card with the top red card.
+   f. Move the top two cards (one red, one black) to the bottom of the deck.
