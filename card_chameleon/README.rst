@@ -67,7 +67,7 @@ Encryption Algorithm
 5. Pad the IV + plaintext message with PKCS#7 padding as described above.
 6. Encrypt each letter in the plaintext with the following steps:
 
-   a) Find the black corresponding to the plaintext character.
+   a) Find the black card corresponding to the plaintext character.
    b) Interpret the red card above this black card as letter "t".
    c) Find the black card corresponding to "t".
    d) Interpret the red card above this black card as your ciphertext character
