@@ -49,11 +49,14 @@ def _unpad_message(message):
         message = message[:-5]
     return message
 
-def _create_iv():
+def _create_iv(n):
     """ Create a random initialization vector.
 
     Prepend a plaintext message with 5 random characters in the same ciphertext
     character base as the rest of the ciphertext.
+
+    Args:
+        n (int): The number of initialization vector characters to generate.
 
     Returns:
         str: An initialization vector string.
@@ -62,15 +65,16 @@ def _create_iv():
 
     chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     r = random.SystemRandom()
-    return ''.join(r.sample(chars, len(chars)))
+    return ''.join(r.sample(chars, n))
 
-def encrypt(message, alg, deck):
+def encrypt(message, alg, deck, n=26):
     """ Encrypt a plaintext message.
 
     Args:
         message (str): The plaintext message.
         alg (object): The specific cipher object.
         deck (list): A full 52-card deck. State is maintained.
+        n (int): The number of initialization vector characters to generate.
 
     Returns:
         str: An encrypted message prepended with an initialization vector.
@@ -78,7 +82,7 @@ def encrypt(message, alg, deck):
     """
 
     ct = []
-    iv = _create_iv()
+    iv = _create_iv(n)
 
     for char in message:
         if not char in list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
@@ -89,28 +93,29 @@ def encrypt(message, alg, deck):
 
     msg = iv + message
     message = _pad_message(msg)
-    message = message[26:] # strip iv for encryption
+    message = message[n:] # strip iv for encryption
 
     for char in message:
         ct.append(alg.prng(deck, char))
 
     return list(iv) + ct
 
-def decrypt(message, alg, deck):
+def decrypt(message, alg, deck, n=26):
     """ Decrypt a ciphertext message.
 
     Args:
         message (str): The ciphertext message.
         alg (object): The specific cipher object.
         deck (list): A full 52-card deck. State is maintained.
+        n (int): The number of initialization vector characters to generate.
 
     Returns:
         str: An decrypted message without the initialization vector.
 
     """
     pt = []
-    iv = message[:26]
-    message = message[26:]
+    iv = message[:n]
+    message = message[n:]
 
     for char in iv:
         alg.prng(deck, char, iv=True)
