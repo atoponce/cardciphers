@@ -102,7 +102,7 @@ Decryption Algorithm
 6. Decrypt each letter in the ciphertext with the following steps;
 
    a) Find the red card corresponding to the ciphertext character. Interpret
-   this card as letter "c".
+      this card as letter "c".
    b) Interpret the black card underneath the red card "C" as letter "t".
    c) Find the red card corresponding to "t".
    d) Interpret the black card below this red card as your plaintext character
