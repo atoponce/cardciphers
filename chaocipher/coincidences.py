@@ -1,4 +1,4 @@
-import talon
+import chaocipher
 import encoder
 
 # setting up the ciphertext
@@ -8,12 +8,11 @@ plaintext = "JELLY LIKE ABOVE THE HIGH WIRE SIX QUAKING PACHYDERMS KEPT THE CLIM
 plaintext *= 5200
 deck = [i for i in xrange(1,53)]
 
-c = talon.Cipher()
-#c.prepare_deck(deck)
+c = chaocipher.Cipher()
+c.prepare_deck(deck)
 
 for char in keyphrase:
-    c.mix_deck(deck)
-    deck = c.count_cut(deck, encoder.plist.index(char)+1)
+    c.prng(deck, char)
 
 ct_list = encoder.encrypt(plaintext, c, deck, 0)
 
@@ -23,7 +22,7 @@ for char in ct_list:
 # finding the index of coincidence
 n = len(ciphertext)
 freq = {}
-alphabet = list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
+alphabet = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 freqsum = 0.0
 last = -1
 count = 0
