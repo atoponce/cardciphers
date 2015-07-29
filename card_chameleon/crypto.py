@@ -34,6 +34,8 @@ if args.key:
     for card in cards:
         deck.append(int(card))
 
+    alg.prepare_deck(deck)
+
     # more tests
     if len(deck) != 52:
         parser.error('The deck must be exactly 52 cards in total.')
