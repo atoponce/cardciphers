@@ -10,6 +10,7 @@ group.add_argument('-d', '--decrypt', help='Decrypt a message')
 group.add_argument('-e', '--encrypt', help='Encrypt a message')
 parser.add_argument('-p', '--passphrase', help='Private passphrase to key deck')
 parser.add_argument('-k', '--key', help='Private comma-separated deck order.')
+parser.add_argument('-b', '--base26', action='store_true', help='Use base-26 encoding/decoding.')
 args = parser.parse_args()
 
 last = -1
@@ -17,6 +18,11 @@ coincidences = 0
 alg = talon.Cipher()
 
 deck = [i for i in xrange(1,53)]
+
+if args.base26:
+    base = 26
+else:
+    base = 52
 
 if args.key:
     deck = []
@@ -56,7 +62,7 @@ if args.passphrase:
 
 if args.encrypt:
     plaintext = args.encrypt.upper()
-    encrypted = encoder.encrypt(plaintext, alg, deck, 5)
+    encrypted = encoder.encrypt(plaintext, alg, deck, 5, base)
 
     ciphertext = ''
     for index, char in enumerate(encrypted):
@@ -68,7 +74,7 @@ if args.encrypt:
 
 elif args.decrypt:
     ciphertext = args.decrypt.replace(' ','')
-    decrypted = encoder.decrypt(ciphertext, alg, deck, 5)
+    decrypted = encoder.decrypt(ciphertext, alg, deck, 5, base)
 
     plaintext = ''
     for char in decrypted:
