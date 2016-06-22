@@ -60,7 +60,7 @@ if args.passphrase:
 
 if args.encrypt:
     plaintext = args.encrypt.upper()
-    encrypted = encoder.encrypt(plaintext, alg, deck, n=26)
+    encrypted = encoder.encrypt(plaintext, alg, deck, n=5)
 
     ciphertext = ''
     for index, char in enumerate(encrypted):
@@ -72,7 +72,7 @@ if args.encrypt:
 
 elif args.decrypt:
     ciphertext = args.decrypt.replace(' ','')
-    decrypted = encoder.decrypt(ciphertext, alg, deck, n=26)
+    decrypted = encoder.decrypt(ciphertext, alg, deck, n=5)
 
     plaintext = ''
     for char in decrypted:
